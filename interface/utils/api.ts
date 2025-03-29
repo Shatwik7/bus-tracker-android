@@ -1,7 +1,9 @@
 import axios, { AxiosError } from 'axios';
 import { Bus, Driver, Stop, BusRoute, LoginResponse, ApiError, updateBusLocationResponse } from '@/types/api';
 
-// Initialize axios instance
+//change the baseURL to your API URL
+// see the wifi IP address of your computer by running the command 'ipconfig' in cmd
+// and look for the IPv4 address of your wifi connection and use it in the baseURL
 const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.29.179:3000',
   timeout: 10000,

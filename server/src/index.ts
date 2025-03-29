@@ -2,6 +2,20 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { buses, bus_Routes,stops } from './database';
 import {authenticated,loginDriver} from './auth';
+import os from 'os';
+
+// Function to get the local network IP
+const getLocalIP = (): string => {
+  const interfaces = os.networkInterfaces();
+  for (const iface of Object.values(interfaces)) {
+    for (const config of iface || []) {
+      if (config.family === 'IPv4' && !config.internal) {
+        return config.address; // Return the first local network IP
+      }
+    }
+  }
+  return '127.0.0.1'; // Fallback to localhost
+};
 
 const app = express();
 
@@ -75,6 +89,8 @@ app.put("/driver/update-location", authenticated, (req:Request, res:Response) =>
 
 // Start the server
 const PORT = 3000;
+const LOCAL_IP = getLocalIP();
 app.listen(PORT, () => {
+    console.log(`Server is running on http://${LOCAL_IP}:${PORT}   <-- use this in Android Emulator utile/api.ts`);
     console.log(`Server is running on http://localhost:${PORT}`);
 });
