@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, ScrollView, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { apiService } from '@/utils/api';
 import type { Bus, Stop } from '@/types/api';
@@ -10,6 +10,7 @@ export default function DriverScreen() {
   const [stops, setStops] = useState<Stop[]>([]);
   const [currentPassengers, setCurrentPassengers] = useState('');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -49,6 +50,11 @@ export default function DriverScreen() {
     router.replace('/');
   };
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    loadData().finally(() => setRefreshing(false));
+  }, []);
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -69,7 +75,12 @@ export default function DriverScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.header}>
         <Text style={styles.title}>Driver Dashboard</Text>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -117,7 +128,7 @@ export default function DriverScreen() {
           ))}
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -130,7 +141,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
-    paddingTop: 60,
   },
   busNumber: {
     fontSize: 20,
@@ -150,7 +160,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingTop: 60,
+    paddingBottom: 20,
+    backgroundColor: '#F8FAFC',
   },
   title: {
     fontSize: 24,
